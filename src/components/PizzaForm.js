@@ -1,15 +1,18 @@
 import React from "react";
 
-function PizzaForm({formData, handleFormChange}) {
+function PizzaForm({formData, handleFormChange, handleSubmit}) {
 
   function onFormChange(e){
 
     handleFormChange(e)
   }
-
+  
+  function onSubmit(e){
+    handleSubmit(e)
+  }
 
   return (
-    <form onSubmit={null /*handle that submit*/}>
+    <form onSubmit={onSubmit}>
       <div className="form-row">
         <div className="col-5">
           <input

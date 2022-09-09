@@ -1,10 +1,21 @@
-import React, {useState} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import Header from "./Header";
 import PizzaForm from "./PizzaForm";
 import PizzaList from "./PizzaList";
 
 function App() {
 
+  // Pizza State and fetch
+  const [pizzas, setPizzas] = useState([])
+  const pizzaEditId = useRef(null)
+
+  useEffect(()=>{
+    fetch("http://localhost:3001/pizzas")
+    .then(res=>res.json())
+    .then(returnedPizzas=> setPizzas(returnedPizzas))
+  }, [])
+
+  // Controlled Form Data state
   const initialState= {
     topping: "",
     size: "Small",
@@ -14,44 +25,68 @@ function App() {
 
   const [formData, setFormData]= useState(initialState)
 
+
+  // Handling Form Changes and Edit Pizza clicks
   function handleFormChange(e){
-    console.log(e.target.name)
-    console.log(formData.vegetarian)
+
+    
     let value = e.target.value
     if (e.target.name === "vegetarian"){
-      value = ![formData.vegetarian]
-      console.log(value)
+      value = !formData.vegetarian
     }
-
+    
     setFormData({
       ...formData,
-      [e.target.name]: value
-    
+      [e.target.name]: value,
     })
   }
 
-  function onEditClick(e){
-    let clickedPizzaRow = e.target.parentNode.parentNode.childNodes
-    let clickedPizzaTopping = clickedPizzaRow[0].textContent
-    let clickedPizzaSize = clickedPizzaRow[1].textContent
-    let clickedPizzaVeg
-    if (clickedPizzaRow[2].textContent === "Yes"){
-       clickedPizzaVeg = true
-    }
-    else { clickedPizzaVeg = false}
-
+  function onEditClick(pizza){
+    pizzaEditId.current = pizza.id
     setFormData({
       ...formData,
-      topping: `${clickedPizzaTopping}`,
-      size: `${clickedPizzaSize}`,
-      vegetarian: clickedPizzaVeg
+      topping: `${pizza.topping}`,
+      size: `${pizza.size}`,
+      vegetarian: pizza.vegetarian
     })
+  }
+
+  //   Handling Form Submit and updating Pizza List
+  
+  function handleSubmit(e){
+    e.preventDefault();
+    fetch(`http://localhost:3001/pizzas/${pizzaEditId.current}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "topping": `${formData.topping}`,
+        "size": `${formData.size}`,
+        "vegetarian": formData.vegetarian
+      })
+    })
+    .then(res=> res.json())
+    .then((patchedPizza)=> updatePizzas(patchedPizza))
+  }
+
+  function updatePizzas(patchedPizza){
+    let updatedPizzas= pizzas.map((pizza)=> {
+      if (pizza.id === patchedPizza.id){
+        return patchedPizza
+      }
+      else {
+        return pizza
+      }
+    })
+    setPizzas(updatedPizzas)
+
   }
   return (
     <>
       <Header />
-      <PizzaForm handleFormChange = {handleFormChange} formData = {formData}/>
-      <PizzaList onEditClick= {onEditClick}/>
+      <PizzaForm handleSubmit= {handleSubmit} handleFormChange = {handleFormChange} formData = {formData}/>
+      <PizzaList pizzas = {pizzas} onEditClick= {onEditClick}/>
     </>
   );
 }

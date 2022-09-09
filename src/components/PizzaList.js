@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Pizza from "./Pizza";
 
-function PizzaList({onEditClick}) {
+function PizzaList({onEditClick, pizzas}) {
 
-  const [pizzas, setPizzas] = useState([])
-
-  useEffect(()=>{
-    fetch("http://localhost:3001/pizzas")
-    .then(res=>res.json())
-    .then(returnedPizzas=>{ 
-      console.log(returnedPizzas)
-      setPizzas(returnedPizzas)
-      console.log(pizzas)})
-  }, [])
 
 
   return (
@@ -26,7 +16,7 @@ function PizzaList({onEditClick}) {
         </tr>
       </thead>
       <tbody>
-      {pizzas.map(pizza => <Pizza key = {pizza.id} onEditClick = {onEditClick} topping = {pizza.topping} size = {pizza.size} vegetarian = {pizza.vegetarian}></Pizza>)}
+      {pizzas.map(pizza => <Pizza key = {pizza.id} onEditClick = {onEditClick} pizza= {pizza}></Pizza>)}
       </tbody>
     </table>
   );

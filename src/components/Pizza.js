@@ -1,15 +1,15 @@
 import React from "react";
 
-function Pizza({topping, size, vegetarian, onEditClick}) {
+function Pizza({pizza, onEditClick}) {
 
   function handleClick(e){
-    onEditClick(e)
+    onEditClick(pizza)
   }
   return (
     <tr>
-      <td>{topping}</td>
-      <td>{size}</td>
-      <td>{vegetarian? "Yes": "No"}</td>
+      <td>{pizza.topping}</td>
+      <td>{pizza.size}</td>
+      <td>{pizza.vegetarian? "Yes": "No"}</td>
       <td>
         <button onClick = {handleClick} type="button" className="btn btn-primary">
           Edit Pizza
